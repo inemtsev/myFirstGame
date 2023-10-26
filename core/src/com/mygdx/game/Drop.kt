@@ -28,14 +28,13 @@ class Drop : ApplicationAdapter() {
     private lateinit var camera: OrthographicCamera
     private lateinit var batch: SpriteBatch
 
+    private val levelTimer: Timer = Timer()
     private val bucket: Rectangle = Rectangle()
     private val raindrops: Array<Rectangle> = Array()
     private var lastDropTime: Long = 0
 
     private var level = 0
     private var score = 0
-
-    private var timer: Timer = Timer()
 
     private val touchPos: Vector3 = Vector3()
 
@@ -62,7 +61,7 @@ class Drop : ApplicationAdapter() {
         bucket.width = 64F
         bucket.height = 64F
 
-        timer.scheduleAtFixedRate(0, 10000) { level++ }
+        levelTimer.scheduleAtFixedRate(0, 10000) { level++ }
 
         spawnRaindrop()
     }
@@ -94,7 +93,7 @@ class Drop : ApplicationAdapter() {
         if(bucket.x < 0) bucket.x = 0F
         if(bucket.x > 800 - 64) bucket.x = 800 - 64F
 
-        if(TimeUtils.nanoTime() - lastDropTime > 1000000000) spawnRaindrop()
+        if(TimeUtils.nanoTime() - lastDropTime > 1000000000/level) spawnRaindrop()
 
         for (raindrop in raindrops) {
             raindrop.y -= 200 * level * Gdx.graphics.deltaTime
@@ -108,7 +107,7 @@ class Drop : ApplicationAdapter() {
     }
 
     override fun dispose() {
-        timer.cancel()
+        levelTimer.cancel()
         dropImage.dispose()
         bucketImage.dispose()
         dropSound.dispose()
